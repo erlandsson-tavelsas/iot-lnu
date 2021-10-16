@@ -36,7 +36,7 @@ lora.join(activation=LoRa.OTAA, auth=(app_eui, app_key), timeout=0)
 
 for x in range(20):
     if not lora.has_joined():
-        print('Not joined yet...attempt, (x+1))
+        print('Not joined yet...attempt ', (x+1))
         time.sleep(2.5)
 
 if not lora.has_joined():
