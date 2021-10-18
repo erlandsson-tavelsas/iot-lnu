@@ -92,29 +92,27 @@ while (True):
         if hdop is not None and hdop < 1.0:
             # Open socket only if GPS is fixed and with a correct reading
             s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
-            s.setsockopt(socket.SOL_LORA, socket.SO_DR, 5)
-            s.setblocking(False)
 
-            # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
-            # sv to an unsigned integer (-2 bytes but requires additional logic at recipient transformation)
-            s.send(struct.pack('<10f',lat,long,sv,hdop))
+            try:
+                s.setsockopt(socket.SOL_LORA, socket.SO_DR, 5)
+                s.setblocking(False)
+                # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
+                # sv to an unsigned integer (-2 bytes but requires additional logic at recipient transformation)
+                s.send(struct.pack('<10f',lat,long,sv,hdop))
+            finally:
+                # Close socket as we are done here
+                s.close()
 
             # Signal success, blue light
             pycom.rgbled(0x0000FF)
-            time.sleep(5) # Sleep 5 seconds so you can
-
-            # Keep the GPS powered up even though the machine is in deepsleep, this will result
-            # a faster "fix" and keep satellites "in sight"
-            py.go_to_sleep(gps=True)
-            machine.deepsleep(60000) # Sleep for 1 minute
         else:
             # Red light means waiting for GPS or quality is poor
             pycom.rgbled(0xFF0000)
-            time.sleep(30) # Sleep 30 seconds before retrying
     else :
         # Red light means waiting for GPS
         pycom.rgbled(0xFF0000)
-        time.sleep(30) # Sleep 30 seconds before retrying
 
-    # Yellow light lit to indicate retrying
-    pycom.rgbled(0xFFFF00)
+    # Sleep 30 seconds before retrying
+    time.sleep(30)
+    # Green light lit to indicate retrying
+    pycom.rgbled(0x00FF00)
