@@ -153,8 +153,7 @@ However, even though we have a continuous power supply, there are still design c
 
 Finally, the GPS sensor is quite sensitive when it comes to locating satellites, if you like me, sitting at your office you should use an external GPS antenna which allows you to sit inside and still being able to have GPS coverage. Attaching the antenna listed above is "a-cannot-do-it-wrong-task" but as the antenna is an active antenna you need to place a jumper connecting the two pins highlighted in the picture below. The Pytrack comes without this jumper so you need to borrow it from elsewhere.
 
-![](C:\Users\tomerl001\OneDrive - Växjö kommun\Documents\IoT\ttnmapper\2021-10-18 10_12_06-Pytrack 2.0X.png)
-
+![](https://github.com/erlandsson-tavelsas/iot-lnu/blob/main/img/pytrack-20x.png)
 
 
 ### Platforms and infrastructure
@@ -270,9 +269,9 @@ Depending on the speed you are traveling with there might be a potential problem
 
 Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my TTIG. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is caused by internal caching in the used library, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver.  Elaborating with the timing made me select a longer interval, every 30 seconds, which ended up as a well-balanced TTN Mapper device for walking, which allows us to use it for approximately 150 minutes a day or a 12 km walk with readings that are more accurate for each point than the 10 seconds approach. 
 
-<img src="C:\Users\tomerl001\OneDrive - Växjö kommun\Documents\IoT\ttnmapper\2021-10-18 13_05_12-TTN Mapper.png" alt="Double taps highlighted in yellow boxes" style="zoom:50%;" />
+![Evenly distributed, every 10 seconds](https://github.com/erlandsson-tavelsas/iot-lnu/blob/main/img/double-taps.png)
 
-![Evenly distributed, every 30 seconds](C:\Users\tomerl001\OneDrive - Växjö kommun\Documents\IoT\ttnmapper\2021-10-18 13_09_29-TTN Mapper.png)
+![Evenly distributed, every 30 seconds](https://github.com/erlandsson-tavelsas/iot-lnu/blob/main/img/single-tap.png)
 
 The payload itself is kept at a bare minimum of 16 bytes, describing 4 float values, Longitude, Latitude, HDOP and Number of visible Satellites. 
 There are still some optimization possible regarding passing a count (number of satellites) as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. 
