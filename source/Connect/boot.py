@@ -5,7 +5,8 @@ import binascii
 lora = LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868)
 
 app_eui = binascii.unhexlify('0000000000000000')
-app_key = binascii.unhexlify('4C19D2CE8B3B94393C44AB29E6A31D2B')
+# Your own app_key here
+app_key = binascii.unhexlify('0000000000000000')
 
 lora.join(activation=LoRa.OTAA, auth=(app_eui, app_key), timeout=0)
 
