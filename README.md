@@ -86,7 +86,7 @@ We are now public and open for business.
 ### Putting everything together
 
 The TTN mapper is a neat task to put together where wiring the antenna is the only externals that has to be attached 
-to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *Lopy4* and *Pytrack* is a very compound unit easy to encapsulate and therefor as an experiment easy to be mobile. Mobility is a key concept for this kind of device otherwise we would not gain much when it comes to measure LoRaWAN® coverage.
+to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *Lopy4* and *Pytrack* is a very compound unit easy to encapsulate and therefor as an experiment easy to be mobile. Mobility is the key for this kind of device otherwise we would not gain much when it comes to measure LoRaWAN® coverage.
 
 >![Photo of a Lopy4 mounted at a Pytrack Shield](img/lopy4-pytrack-true.jpg)
 >Fig 3, the Lopy4 mounted at a Pytrack 2.0.X
@@ -96,36 +96,34 @@ to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *
 One should know that building a TTN mapper by yourself is more about having fun than filling a gap in the market.
 With that in mind you might also consider [cheaper hardware](https://sensebox.de/projects/en/2020-03-06-ttn-mapper) and perhaps focus on a high power usage efficiency but the *Pycom* parts has good documentation and with the *Pymakr* plugin I would say that I'm happy with using these components.
 
-The device design is simple but we need to consider how to power the device and reason about the power source. 
+The device design is simple but we need to consider how to power the device and reasoning about the power source itself. 
 Using a deep sleep approach to preserve battery requires us to wait before getting coordinates as the GPS locator required 1 - 2 minutes to be accurate. 
 
-So, why did we then choose the *Pytrack* at all? The reason is simple, this is the nature of the GPS itself so regardless if we are using the *Pytrack* or any other disintegrated GPS we need to wait for it after it is powered up. With *Pytrack* we don't need an shield, like the *Expansion Board 3.1* or a circuit board used for wiring the sensor so the *Pytrack* is quite cheap even though the GPS capability itself could be found slight cheaper. 
+So, why did we then choose the *Pytrack* at all? The reason is simple, this is the nature of the GPS itself so regardless if we are using the *Pytrack* or any other disintegrated GPS c we need to wait for it after it is powered up. With *Pytrack* we also don't need an shield, like the *Expansion Board 3.1* with an external sensor attached through wire so the *Pytrack* is quite cheap even though the GPS capability itself could be found slight cheaper. 
 
-So back to problem with the power consumption ...
+So what about the power consumption?
 
-To achieve a lot of coverage data we would probably need to travel by some kind of vehicle, preferably a car or something. This means that we would probably power the device from the cars cigarette outlet by a simple USB cable. Even though if we would change our preferred way to travel around using a bicycle we could use the same connector (USB) and power the device with a cheap power bank or similar, in my case a very cheap power bank (6700 mAh) bought years ago at *Clas Ohlsson*. The sensor would also most certainly return to home every day so a long lived autonomous device would not be necessary. 
+To achieve a lot of coverage data we would probably need to travel by some kind of vehicle, preferably a car or something. This means that we also most certainly can power the device from the cars cigarette outlet by a simple USB cable. Even though if we would change our preferred way to travel around using a bicycle we could use the same connector (USB) and power the device with a cheap power bank, in my case a very cheap power bank (6700 mAh) bought years ago at *Clas Ohlsson*. The sensor would also most certainly return to home every day so a long lived autonomous device would not be necessary. 
 
-However, even though we have a continuous power supply, there are still design consideration about the actual communication with the TTN platform,  which we will address later. 
-
-Finally, the GPS sensor is quite sensitive when it comes to locating satellites, if you like me, sitting at your office you should use an external GPS antenna which allows you to sit inside and still being able to have GPS coverage. Attaching the antenna listed above is "a-cannot-do-it-wrong-task" where an active antenna need have a jumper attached, connecting the two pins highlighted in the picture below. The *Pytrack* is shipped without this jumper so you need to borrow it from elsewhere.
+Finally, the GPS sensor is quite sensitive when it comes to locating satellites, if you like me, sitting at the office you would appreciate an external GPS antenna which allows you to sit inside and still being able to have GPS access. Attaching the antenna listed above is "a-cannot-do-it-wrong-task" where an active antenna need have a jumper attached, connecting the two pins highlighted in the picture below. The *Pytrack* is shipped without this jumper so you need to borrow it from elsewhere.
 
 >![Pytrack 2.0.x with highlighted jumper for active GPS antenna](img/pytrack-20x.png)
 >Fig 4, Pytrack active antenna jumper setting 
 
 ### Platforms and infrastructure
 
-The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others why the TTIG was used for this project. TTIG is naturally connected with the TTN so using The Things Stack (TTS) as backend is more about using what we already have. 
+The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others so using a TTIG for this project is a no-brainer, especially as many of the vendors have it in stock. TTIG is also naturally connected with the TTN so using The Things Stack (TTS) as backend is more about using what we already have.
 
-TTS is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application, so you can think of TTS as a middleware or service bus. There are many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
+TTS is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application. You can think of TTS as a middleware or service bus where you can find many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
 
-For this project we need to connect it to the TTN Mapper application which held a storage for coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to (a) gateway and establish a session with the backend using the device *EUI*, at the backend processes each incoming requests from the device by formatting and forward it to the TTN mapper application. 
+For this project we need to connect it to the TTN Mapper application designated to store coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to a gateway and establish a session with the backend using the device *EUI* and an application key, the backend then processes each incoming requests from the device by formatting and forward it to the TTN mapper application. 
 
 >![The information flow illustrated in combination with photos](img/communication-path.png)
 >Fig 5, information flow from device to application
 
-The contract for the TTN mapper requires at least **Latitude** and **Longitude** together with **at least one quality measure** to get accepted by the TTN Mapper. These attributes needs to be committed by device and in our case we transformed then it to *JSON* format using a TTN payload formatter which is applied before transmitting the final payload to TTN Mapper. The transformer source can find below in the code section. 
+The information contract provided by the TTN mapper requires at least **Latitude** and **Longitude** together with **at least one quality measure** to get accepted by the TTN Mapper. These attributes needs to be committed by the device and in our case we we accept them in the TTSv3 and transformed the bytes to a *JSON* format payload using a TTN formatter, applied before transmitting the final payload to TTN Mapper. The transformer source can be find below in the code section. 
 
-Once done with the transformation we can switch on the TTN Mapper integration which in version 3 is done by a predefined webhook, this webhook defaults with necessary configuration where the recommendation is to add an "experiment" header when you start up your transmission. Experiments can be search for and seen at the TTN mapper web but will not appear in the public map. So, tuning it before removing the experiment name can be a good idea. 
+Once done with the transformation we can enable the TTN Mapper integration by using a predefined webhook, this webhook uses default settings to build up the configuration where the recommendation is to add an "experiment" header when you start up your transmission. "Experiments" can be used for testing your device and can be seen at the TTN mapper web but will not appear in the public map. So, tuning you device before removing the experiment name is recommended. 
 
 The public community network uses a "fair use policy" which limits the **airtime to 30 seconds every 24 hours per node** (or device) which is a small number and might not be useful for all devices. It also limits the number of downlink messages to **10/day and node**. During the elaboration I used more than 30 seconds and day to test how it was reacting to an consumption exceeding the "fair use policy" but it seems like it is based on trust rather than an enforcing policy as all packages went through. 
 
@@ -154,15 +152,15 @@ else:
 pycom.rgbled(0xFFFF00)
 ```
 
-The business logic is kept in a loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoRaWAN®. We ignore the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the TTN Mapper documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default *Pycom* drivers for *Pytrack* only coordinates were accessible so I needed another driver which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found a matching one available at the [andreathemac GitHub repository](https://github.com/andrethemac/L76GLNSV4) 
+The business logic is kept in a loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoRaWAN®. We ignore the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the TTN Mapper documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default *Pycom* drivers for *Pytrack* only coordinates were accessible so I needed another driver which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found one matching these requirements at the [andreathemac@GitHub](https://github.com/andrethemac/L76GLNSV4) repository 
 
-For each iteration in the loop, we make a GPS reading (`l76` is the object representing the sensor) and the check the quality before emitting an event to the gateway with the collected GPS values. During this process we visualize the progress with the RGB LED where
+For each iteration in the loop, we make a GPS reading (`l76` is the object representing the GPS) and check the quality before emitting an event to the gateway with the collected GPS values. During this process we visualize the progress with the RGB LED where
 
 - Blue is "waiting"
 - Green is "sending" 
 - Red indicates a "GPS accuracy problem", which typically happens the first 2 - 3 iterations while the GPS is fixating the satellites or if you're inside without any window nearby 
 
-The idea with the visuals is that it should be easy to confirm that the device is working and its current state. So blue light and green blips every 30 seconds signals success 
+The idea with the visuals is that it should be easy to confirm that the device is working and its current state. So, blue light with green blips every 30 seconds signals a working device 
 
 ```python
 while (True):
@@ -212,9 +210,9 @@ while (True):
     pycom.rgbled(0x00FF00)
 ```
 
-During elaboration I made two separate project where similar, one referred to as the [continuous on](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper%20-%20Always%20on) and the other as [deep sleep/awake](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper)
+During elaboration I made two separate project very similar, one referred to as the [continuous on](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper%20-%20Always%20on) and the other as [deep sleep/awake](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper)
 
-The deep sleep/awake is better suited for autonomous operations like being placed in a car and wake up every X minutes and do its job. To avoid unnecessary start up time for the GPS, which takes 1 - 2 minutes to get accurate readings, there is a feature where you can put the machine in deep sleep but preserve the GPS powered. This is more or less the only difference between the two projects and could be summarized by these two line of code. 
+The deep sleep/awake version is better suited for autonomous operations like being placed in a car and wake up every X minutes and do its job. To avoid unnecessary start up time for the GPS, which takes 1 - 2 minutes to get accurate readings, there is a feature where you can put the machine in deep sleep but preserve the *Pytrack* GPS powered. This is more or less the only difference between the two projects and could be summarized by these two line of code. 
 
 ```python
 # Keep the GPS powered up even though the machine is in deepsleep, this will result
@@ -227,12 +225,11 @@ machine.deepsleep(60000) # Sleep for 1 minute
 
 The problem definition at first was how you could connect multiple devices for agricultural measures spread across 20 acres or more where some long range bearer was needed.  The lack of such bearer made me shifting focus and use some kind of self-service approach i e bring your own network and try to it as cheap as possible. So both LoRaWAN® and Sigfox would have been candidates but the first seems to have a better public available documentation than Sigfox. It also might have been influenced by previous classes of the course where there were a lot of samples connecting with LoRaWAN®. 
 
-For the mapper device I started with the idea of a 1 minute execution cycle where the device was put in deep sleep between the send windows. 
-The *Pygate* can be kept awake while the machine is into deep sleep which saves time when it wakes up. The GPS will need 1 - 2 minutes before having a so called "fix" at the satellites. Sending a message every 6 minute would have cost us 1 second airtime each hour (~0.1 seconds for each message) which allows us to have the device continuously reporting 24/7. The complete source for this "machine deep sleep/ GPS keep awake" configuration could be found in the [source catalog](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper).
+For the mapper device I started with the idea of a 1 minute execution cycle where the device was put in deep sleep between the send windows. The *Pygate* can be kept awake while the machine is into deep sleep which saves time when it wakes up. The GPS will need 1 - 2 minutes before having a so called "fix" at the satellites. Sending a message every 6 minute would have cost us 1 second airtime each hour (~0.1 seconds for each message) which allows us to have the device continuously reporting 24/7. The complete source for this "machine deep sleep/ GPS keep awake" configuration could be found in the [source catalog](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper).
 
-Depending on the speed you are traveling with there might be a potential problem with a slew between the GPS readings and the payload transmission, I also find it a little bit boring waiting for the wake up call and therefor made some adjustments making it better targeting a pedestrian carrier. In this scenario I never put the machine into deep sleep unless it couldn't find a LoRaWAN® network to join. Instead we keep the session (join) open and pumping events every X seconds. 
+Depending on the speed you are traveling with there might be a potential problem with a minor discrepancy between the GPS readings and the payload transmission, I also find it a little bit boring waiting for the wake up call and therefor made some adjustments to better fit a pedestrian carrier. In this scenario I never put the machine into deep sleep unless it couldn't find a LoRaWAN® network to join. Instead we keep the session (joined) open and pumping events every X seconds. 
 
-Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my gateway. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is probably caused by some kind of timing problem how the code uses the library or maybe the library itself, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver. **I haven't figured out this yet** but when I elaborated with the interval and set it to every 30 seconds it seems like the mapper device became well-balanced when walking, so I consider this as a **work around** for now. The increased interval also allows us to use it for a longer period, approximately 150 minutes a day or a 12 km walk at the same time as the double-taps disappeared. 
+Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my gateway. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is probably caused by some kind of timing problem how the code uses the library or maybe the library itself, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver. **I haven't figured out this yet** but when I elaborated with the interval and set it to every 30 seconds it seems like the mapper device became well-balanced when walking, so I consider this as a **work around** for now. The increased interval also allows us to use it for a longer period, approximately 150 minutes a day or a 12 km walk at the same time as the double-taps disappeared, a win-win situation.
 
 ><img src="img/different-time-settings.png" alt="Highlight of different interval settings from map" style="zoom: 67%;" />
 >Fig 6, Yellow boxes 10 seconds, Green 30 seconds
@@ -240,7 +237,7 @@ Starting with 10 seconds it allows us to rapidly create a pretty fine grained vi
 
 
 The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. 
-There are still some optimization possible regarding passing number of satellites as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now. 
+There are still some optimization possible regarding passing number of satellites as an unsigned integer instead of a float. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now regardless. Our device has both a power source and was not intended to be autonomous for longer than a day so I decided to spare complexity at the transformation at the server-side rather than save those 2 or 4 extra bytes while transmitting. 
 
 ```python
 # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
@@ -304,16 +301,17 @@ With a couple of mapping sessions, trying to cover the the same distance from no
 >![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low
 
-This means that the costs, **SEK 7,50/acre**, for bringing your own LoRaWAN® network to the farm wouldn't be an issue as the sensors themselves way exceeds the network connectivity costs. However, there are of course a couple of concerns that needs to be addressed.
+This means that the costs **SEK 7,50/acre**, for bringing your own LoRaWAN® network to the farm wouldn't be an issue as the sensors themselves way exceeds the network connectivity costs. From the project setup, there are still a couple of concerns that needs to be addressed.
 
 First, setting up a gateway for professional use is probably better done with an outdoor gateway with a constant power supply compared to an indoor ditto plugged in into a random power outlet. Mounted at a high place and with an external antenna it will also extends the range multiple times and provide a more reliable access to LoRaWAN®. Still affordable, with a list price between [SEK 4000 - 6000](https://connectedthings.store/gb/lorawan-gateways/outdoor-lorawan-gateways/), the outdoor gateway will cover at least 500 acres (yes, such linear approximation is stupid) but probably more for the same cost/acre. 
 
-For agricultural sensors the covered area would more or less targeting open landscapes, without any hard obstacle that might interfere the signals. However, many of the farms today typically have a mixed business model including both agricultural as well as forestry operations where the latter might be a bigger challenge when it comes to create network presence for Internet of Things. The same things applies to the open landscapes at a scattered property which could not be covered by a single gateway but has to be applied over several gateways, I believe this is were the crowd source aspects would matter. 
+For agricultural sensors the covered area would more or less targeting open landscapes, without any hard obstacle that might interfere with the signals. This assumption applies to smaller farms. However, many of the farms today typically have a mixed business model including both agricultural as well as forestry operations where the latter might be a bigger challenge when it comes to create network presence for Internet of Things. The same things applies to the open landscapes at a scattered property which could not be covered by a single gateway but has to be applied over several gateways, I believe this is were the crowd source aspects would matter. 
 
 #### If I had more time then I would have...
 
-* ... bought an outdoor gateway with antenna and performed the same measures to understand performance better
+* ... bought an outdoor gateway with antenna and performed the same measures to understand the problem better
 * ... tested Sigfox connectivity using the same approach to see if a commercial network has a better coverage
-* ... tested with a passive external GPS antenna with a better "mobility-first" design 
+* ... tested with a passive external GPS antenna with a better "mobility-first" design/form factor
 * ... elaborated with obstacles and degradations, i e how buildings, kind of forests, slopes, hills etc affects the signal  
-* ... fixed the physical packaging of the device with a wake up/deep sleep configuration and placed 3 or 4 of them on the companies fleet of vehicles for at least 1 month where they autonomous could collecting data in Växjö and surroundings 
+* ... fixed the device's physical packaging with a wake up/deep sleep configuration and placed 3 or 4 of them on the companies fleet of vehicles for at least 1 month where they autonomous could collecting data in Växjö and surroundings 
+
