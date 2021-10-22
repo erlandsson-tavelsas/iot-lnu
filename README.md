@@ -304,7 +304,7 @@ With a couple of mapping sessions, trying to cover the the same distance from no
 >![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low
 
-This means that the costs, **SEK 7,50/acre**, for bringing your own LoRaWAN® network to the farm wouldn't be an issue as the sensors themselves way exceeds the network connectivity costs. However, there are of course a couple of concerns that needs to be addressed. 
+This means that the costs, **SEK 7,50/acre**, for bringing your own LoRaWAN® network to the farm wouldn't be an issue as the sensors themselves way exceeds the network connectivity costs. However, there are of course a couple of concerns that needs to be addressed.
 
 First, setting up a gateway for professional use is probably better done with an outdoor gateway with a constant power supply compared to an indoor ditto plugged in into a random power outlet. Mounted at a high place and with an external antenna it will also extends the range multiple times and provide a more reliable access to LoRaWAN®. Still affordable, with a list price between [SEK 4000 - 6000](https://connectedthings.store/gb/lorawan-gateways/outdoor-lorawan-gateways/), the outdoor gateway will cover at least 500 acres (yes, such linear approximation is stupid) but probably more for the same cost/acre. 
 
