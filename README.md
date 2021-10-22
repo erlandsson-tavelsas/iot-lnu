@@ -66,7 +66,7 @@ The installation of the Indoor gateway is a straight forward task, where I first
 
 [Guide - Claim your TTSv3 Gateway](https://www.thethingsindustries.com/docs/gateways/gateway-claiming/claim-gateways/)
 
->![](img\gateways-ttnv3.png)
+>![List of gateways in The Things Stack Console](img/gateways-ttnv3.png)
 >Fig 1, my registered/claimed gateways 
 
 As you can see there I've two registered gateways, the TTIG and the previously mentioned 1-channel *Dragino LG01-N*. 
@@ -77,7 +77,7 @@ limited in TTSv3.
 Once claimed I expect it to appear in the [ttnmapper.org](https://ttnmapper.org/) map as a connected but without coverage data gateway. 
 We are now public and open for business.
 
-><img src="img\public-apperance.png" style="zoom: 80%;" />
+><img src="img/public-apperance.png" style="zoom: 80%;" />
 >Fig 2, Gateway visible at the ttnmapper.org
 
 ### Putting everything together
@@ -85,8 +85,8 @@ We are now public and open for business.
 The TTN mapper is a neat task to put together where wiring the antenna is the only externals that has to be attached 
 to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *Lopy4* and *Pytrack* is a very compound unit easy to encapsulate and therefor as an experiment easy to be mobile. Mobility is a key concept for this kind of device otherwise we would not gain much when it comes to measure LoraWAN coverage.
 
->![](img\lopy4-pytrack-true.jpg)
->Fig 3, the Lopy4 at Pytrack 2.0.X
+>![Photo of a Lopy4 mounted at a Pytrack Shield](img/lopy4-pytrack-true.jpg)
+>Fig 3, the Lopy4 mounted at a Pytrack 2.0.X
 
 One should know that building a TTN mapper by yourself is more about having fun than filling a gap in the market.
 With that in mind you might also consider [cheaper hardware](https://sensebox.de/projects/en/2020-03-06-ttn-mapper) and perhaps focus on a high power usage efficiency but the *Pycom* parts has good documentation and with the *Pymakr* plugin I would say that I'm happy with using these components.
@@ -103,7 +103,7 @@ However, even though we have a continuous power supply, there are still design c
 
 Finally, the GPS sensor is quite sensitive when it comes to locating satellites, if you like me, sitting at your office you should use an external GPS antenna which allows you to sit inside and still being able to have GPS coverage. Attaching the antenna listed above is "a-cannot-do-it-wrong-task" where an active antenna need have a jumper attached, connecting the two pins highlighted in the picture below. The *Pytrack* is shipped without this jumper so you need to borrow it from elsewhere.
 
->![Pytrack 2.0.x - Highlighted Jumper](img/pytrack-20x.png)
+>![Pytrack 2.0.x with highlighted jumper for active GPS antenna](img/pytrack-20x.png)
 >Fig 4, Pytrack active antenna jumper setting 
 
 ### Platforms and infrastructure
@@ -114,7 +114,7 @@ TTN is about to connect data using some standard communication or storage soluti
 
 For this project we need to connect it to the TTN Mapper application which helds a storage for coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to (a) gateway and establish a session with the backend using the device *EUI*, at the backend each incoming requests from the device is formatted and forwarded to the TTN mapper application. 
 
->![](img\communication-path.png)
+>![The information flow illustrated in combination with photos](img/communication-path.png)
 >Fig 5, information flow from device to application
 
 The contract for the TTN mapper requires at least **Latitude** and **Longitude** together with **a quality measure** to get accepted by the TTN Mapper. These attributes needs to be committed by device and in our case we transformed then it to *JSON* format using a TTN payload formatter which is applied before transmitting the final payload to TTN Mapper. The transformer source can find below in the code section. 
@@ -228,11 +228,13 @@ Depending on the speed you are traveling with there might be a potential problem
 
 Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my TTIG. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is probably caused by some kind of timing problem how the code uses the library or maybe the library itself, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver. I haven't solved this at this time but when I elaborated with the interval and set it to every 30 seconds it seems like the TTN Mapper became well-balanced when walking. The increased interval also allows us to use it for a longer period, approximately 150 minutes a day or a 12 km walk at the same time as the double-taps disappeared. 
 
-><img src="img/different-time-settings.png" alt="Evenly distributed, every 30 seconds" style="zoom: 67%;" />
+><img src="img/different-time-settings.png" alt="Highlight of different interval settings from map" style="zoom: 67%;" />
 >Fig 6, Yellow boxes 10 seconds, Green 30 seconds
 
-The payload itself is kept at a bare minimum of 16 bytes, describing 4 float values, Longitude, Latitude, HDOP and Number of visible Satellites. 
-There are still some optimization possible regarding passing a count (number of satellites) as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. 
+
+
+The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites**. 
+There are still some optimization possible regarding passing number of satellites as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. 
 
 ```python
 # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
@@ -273,15 +275,19 @@ function decodeUplink(input) {
 
 The Things Stack (TTS) comes with a predefined *Webhook* for integrating with TTN Mapper application and it can also be found below the Application section (1) and Integrations (2) where you can find the template when you create a Webhook (3). 
 
->![TTSv3 - Add a Webhook](img/add-webhook.png)
+>![TTSv3 - Add a Webhook in Console](img/add-webhook.png)
 >Fig 7, register TTN Mapper Webhook
+
+
 
 Note, you can set an experimental name (4) which allows you to publish these values without promoting them to the public coverage map, very useful if you, let's say mixing up longitude and latitude values which is very common where I live ;)
 
 When you finally start mapping coverage you will can see that everything works as expected by watching the Live data stream for the device (or application). You should see a stream of events with the type "Forward uplink data message" containing a *JSON* payload with the transformed values that we have recorded 
 
->![TTSv3 - Application Data](img/application-data.png)
+>![TTSv3 - Application Data displayed in Console](img/application-data.png)
 >Fig 8, uplink message log for the TTN mapper device
+
+
 
 The visualization in the [mapper](https://ttnmapper.org/) application is immediately available if you search for device EUI, gateway or experiment name in tab [Advanced maps](https://ttnmapper.org/advanced-maps/), the where the search result could be visualized in a [map](https://ttnmapper.org/devices/?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) or exported as a [csv](https://ttnmapper.org/devices/csv-pg.php?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) resultset. 
 
@@ -289,7 +295,7 @@ The visualization in the [mapper](https://ttnmapper.org/) application is immedia
 
 With a couple of mapping sessions, trying to cover the the same distance at north, south, east and west directions from the gateway, I'm stunningly realize that the Indoor gateway way exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the best strength which means it will easily cover`400 * 400 * 3,14 ~= 500000 square meters` which translates into 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without problem
 
->![](img/expanded-coverage.png)
+>![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low
 
 This means that the costs, **SEK 7,50/acre**, for manage your own *LoraWAN* network wouldn't be an issue as the sensors themselves way exceeds the network connectivity. However, there are of course a couple of concerns that needs to be covered. 
