@@ -16,15 +16,15 @@ TTN is a so called crowd sourced project where the punchline **bring your own ga
 
 ### Objectives
 
-Building a TTN Mapper is more fun than valuable but for me it's important to understand how far away from the gateway it would be possible to put sensors and using static locations (i e a fixed sensor location) wouldn't make it possible to walk around in the terrain and get an idea what causes a degradation in the coverage. 
+Build a mobile TTN Mapper device to learn and understand the basics of how to build and operate a Internet of Things device and use the same for elaborate with coverage from a The Things Indoor Gateway (TTIG).
 
-A mobile TTN Mapper device is probably not an per-year autonomous device, nor is it a device that need to support military accuracy when it comes to geolocation, in my point of view a couple of meters would be fine as it still will give you a relevant score for the coverage. With that said, I down prioritize power consumption and exact position when the message was sent (based on the theoretically speed of a vehicle hosting the device), i e the time between GPS read and sending the message through LoRaWAN®.  
+A mobile TTN Mapper device is probably not an per-year autonomous device, nor is it a device that need to support military accuracy when it comes to location, in my point of view a couple of meters would be fine as still gives you a relevant score for the coverage. With that said, I down prioritize power consumption and exact position when the message was sent, in this scenario the time between a GPS read and sending the message through LoRaWAN®.  
 
-To be honest, I bought an indoor gateway and hoped that if I put it close to a window I might be able to cover a couple of meters outside from the house ... but I was wrong.
+To be honest, I bought an indoor gateway and hoped that if I put it close enough to a window I might be able to cover a couple of meters outside from the house ... but I was wrong.
 
 ### Material
 
-You really don't need your own TTN gateway but my original problem was the lack of LoRaWAN® presence so to start working I need such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty of other gateways you can use but this one comes with a automatic setup for TTN.
+You really don't need your own TTN gateway but my original problem was the lack of LoRaWAN® presence so to start working I need such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty of other gateways you can use but this one comes with a automatic setup for TTNv3.
 
 *When I first started I didn't realized that there is a new version (3) of the TTN where the simplified*
 *Semtech UDP Packet Forwarder protocol has been abandoned something I realized as I first started to test with a cheaper (1-channel) gateway, the [Dragino LG01-N](https://www.dragino.com/products/lora-lorawan-gateway/item/117-lg01-p.html). I did manage to get this up and running but the lack of support in the TTS forced me to abandon this setup quite fast.*
@@ -45,8 +45,6 @@ At the time, some components where hard to find and as the idea of the project s
 several vendors, however the freight cost from *Mouser* was zero (0) for orders exceeding SEK 500 so an additional GPS antenna
 make that one free of charge. You should also have in mind that most of the vendors have a Swedish website but they are
 located outside EU (except *RS-Components*) which means that you have to be aware of taxes required when importing this.
-
-You should also know that when this report was written (autumn 2021), there was a global lack of semi-conductors and the Brexit grinded the gears when it comes to transports within UK. Even though that I only ordered items in stock, the *Digikey* order took more than 2 weeks between confirmation and when it was delivered.
 
 
 ### Environment setup
@@ -116,16 +114,16 @@ Finally, the GPS sensor is quite sensitive when it comes to locating satellites,
 
 ### Platforms and infrastructure
 
-The problem definition is about having LoRaWAN® coverage at the countryside but also sharing why the TTIG was used for this project. TTIG is naturally connected with the TTN so using The Things Stack as backend is more about using what we already have. 
+The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others why the TTIG was used for this project. TTIG is naturally connected with the TTN so using The Things Stack (TTS) as backend is more about using what we already have. 
 
-TTN is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application, so you can think of TTS as a middleware or service bus. There are many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
+TTS is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application, so you can think of TTS as a middleware or service bus. There are many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
 
-For this project we need to connect it to the TTN Mapper application which helds a storage for coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to (a) gateway and establish a session with the backend using the device *EUI*, at the backend each incoming requests from the device is formatted and forwarded to the TTN mapper application. 
+For this project we need to connect it to the TTN Mapper application which held a storage for coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to (a) gateway and establish a session with the backend using the device *EUI*, at the backend processes each incoming requests from the device by formatting and forward it to the TTN mapper application. 
 
 >![The information flow illustrated in combination with photos](img/communication-path.png)
 >Fig 5, information flow from device to application
 
-The contract for the TTN mapper requires at least **Latitude** and **Longitude** together with **a quality measure** to get accepted by the TTN Mapper. These attributes needs to be committed by device and in our case we transformed then it to *JSON* format using a TTN payload formatter which is applied before transmitting the final payload to TTN Mapper. The transformer source can find below in the code section. 
+The contract for the TTN mapper requires at least **Latitude** and **Longitude** together with **at least one quality measure** to get accepted by the TTN Mapper. These attributes needs to be committed by device and in our case we transformed then it to *JSON* format using a TTN payload formatter which is applied before transmitting the final payload to TTN Mapper. The transformer source can find below in the code section. 
 
 Once done with the transformation we can switch on the TTN Mapper integration which in version 3 is done by a predefined webhook, this webhook defaults with necessary configuration where the recommendation is to add an "experiment" header when you start up your transmission. Experiments can be search for and seen at the TTN mapper web but will not appear in the public map. So, tuning it before removing the experiment name can be a good idea. 
 
