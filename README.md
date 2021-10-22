@@ -8,46 +8,45 @@
 
 ### Problem definition
 
-My first idea of this project was to build some smart device for the agricultural sector where a later could use the data for predicting the future using Machine Learning. This is probably the most straight forward idea, collect data and then analyze it which is a less technical aspect but more about valuation. However, the idea ends abrupt before I really start working with it, where I realize that covering 20 acres of agricultural landscape requires something else than an WiFi. So, in order to got it to work I needed an alternative bearer able to send data to a collector where I decided to got for the LoRaWAN approach which seems to be well-balanced choice. 
+My first idea of this project was to build some smart device for the agricultural sector where a later could use the data for predicting the future using Machine Learning. This is probably the most straight forward idea, collect data and then analyze it which is a less technical aspect but more about valuation. However, the idea ends abrupt before I really start working with it, where I realize that covering 20 acres of agricultural landscape requires something else than an WiFi. So, in order to got it to work I needed an alternative bearer able to send data to a collector where I decided to got for the LoRaWAN® (Long Range Wide Area Network) approach which seems to be well-balanced choice. 
 
-Växjö Energi AB, VEAB, have a gateway for LoraWAN setup in the city area but the signal is not in sight where I live, 10 km away, so the project become a task to setup my own LoraWAN and evaluate the coverage per monetary unit (i.e. the amount of covered acres per Krona). To achieve such understanding I need to create a tool able to pick up the signal and measure it's strength and the device location and put this recording into a map which visualize these findings. Fortunately, there are a couple of community networks already having such features which allowed me to focus at the actual coverage and less at visualizing data. The choice fell at The Things Network (TTN) where the The Things Network Mapper application provided me with the visualization. Connecting to the TTN also allows me to work with The Things Stack (TTS) a back end stack which makes it possible to store and/or forward sensor data to other locations with both predefined but also custom made integrations where the above TTN Mapper is one of the predefined.    
+Växjö Energi AB, VEAB, have a gateway for LoRaWAN®setup in the city area but the signal is not in sight where I live, 10 km away, so the project become a task to setup my own LoRaWAN®and evaluate the coverage per monetary unit (i e the amount of covered acres per SEK). To achieve such understanding I need to create a tool able to pick up the signal and measure it's strength and the device location and put this recording into a map which visualize these findings. Fortunately, there are a couple of community networks already having such features which allowed me to focus at the actual coverage and less at visualizing data. The choice fell at The Things Network (TTN) where the The Things Network Mapper application provided me with the visualization. Connecting to the TTN also allows me to work with The Things Stack (TTS) a back end stack which makes it possible to store and/or forward sensor data to other locations with both predefined but also custom made integrations where the above TTN Mapper is one of the predefined.    
 
-TTN is a so called crowd sourced project where the punchline **bring your own gateway** represents the essence of the areas covered, in other words, if you don't have LoraWAN coverage at your location, setup your own gateway and share it.
+TTN is a so called crowd sourced project where the punchline **bring your own gateway** represents the essence of the areas covered. In other words, if you don't have LoRaWAN® coverage at your location, setup your own gateway and share it with your neighborhood.	
 
 ### Objectives
 
 Building a TTN Mapper is more fun than valuable but for me it's important to understand how far away from the gateway it would be possible to put sensors and using static locations (i e a fixed sensor location) wouldn't make it possible to walk around in the terrain and get an idea what causes a degradation in the coverage. 
 
-A mobile TTN Mapper device is probably not an per-year autonomous device, nor is it a device that need to support military accuracy when it comes to geolocation, in my point of view a couple of meters would be fine as it still will give you a relevant score for the coverage. With that said, I down prioritize power consumption and exact position when the message was sent (based on the theoretically speed of a vehicle hosting the device), i e the time between GPS read and sending the message through LoraWAN.  
+A mobile TTN Mapper device is probably not an per-year autonomous device, nor is it a device that need to support military accuracy when it comes to geolocation, in my point of view a couple of meters would be fine as it still will give you a relevant score for the coverage. With that said, I down prioritize power consumption and exact position when the message was sent (based on the theoretically speed of a vehicle hosting the device), i e the time between GPS read and sending the message through LoRaWAN®.  
 
 To be honest, I bought an indoor gateway and hoped that if I put it close to a window I might be able to cover a couple of meters outside from the house ... but I was wrong.
 
 ### Material
 
-You really don't need your own TTN gateway but my original problem was the lack of LoraWAN presence so to start working I need such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty
-of other gateways you can use but this one comes with a automatic setup for TTN.
+You really don't need your own TTN gateway but my original problem was the lack of LoRaWAN® presence so to start working I need such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty of other gateways you can use but this one comes with a automatic setup for TTN.
 
 *When I first started I didn't realized that there is a new version (3) of the TTN where the simplified*
 *Semtech UDP Packet Forwarder protocol has been abandoned something I realized as I first started to test with a cheaper (1-channel) gateway, the [Dragino LG01-N](https://www.dragino.com/products/lora-lorawan-gateway/item/117-lg01-p.html). I did manage to get this up and running but the lack of support in the TTS forced me to abandon this setup quite fast.*
 
-Measure the coverage requires a sensor able to provide the device with GPS coordinates, where the *Pytrack* fit well together with the *LoPy4* micro controller, the combination would end up in a very neat and slim hardware configuration. I also invested some money in the LoRa and GPS antenna to ensure that both the GPS as well as the LoRaWAN coverage measure would not depend on the TTN Mapper but rather the gateway itself.
+Measure the coverage requires a sensor able to provide the device with GPS coordinates, where the *Pytrack* fit well together with the *Lopy4* micro controller, the combination would end up in a very neat and slim hardware configuration. I also invested some money in the LoRaWAN® and GPS antenna to ensure that both the GPS as well as the LoRaWAN® coverage measure would not depend on the TTN Mapper but rather the gateway itself.
 
 Below you can find a list of the required hardware I used for the project and from where I order them.
 
-| Component | Capabilities | Price (incl VAT, excl freight) | Vendor link | 
+| Component | Capabilities | Price (incl VAT, excl freight) | Vendor link |
 | --------- | ---------------- | ---------| ------- |
 | [Pycom Lopy4](https://pycom.io/product/lopy4/)   | Microcontroller | SEK 480 | [Digikey](https://www.digikey.se/products/sv?keywords=lopy4) |
 | [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
 | Pycom LoRa/Sigfox antenna | Send/receive | SEK 180 | [Digikey](https://www.digikey.se/product-detail/sv/pycom-ltd/SIGFOX-LORA-ANTENNA-KIT/1871-1005-ND/7721843) |
 | External GPS antenna  | Increased GPS receiver | SEK 225 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565430465?qs=sGAEpiMZZMv0NwlthflBi%252BaVk7F50MhHRCD37BDS1ng%3D) |
-| [The Things Indoor Gateway](https://connectedthings.store/gb/lorawan-gateways/indoor-lorawan-gateways/the-things-indoor-gateway-868-mhz.html) | LoRaWAN gateway | SEK 750 | [RS-Components](https://se.rs-online.com/web/p/communication-wireless-development-tools/2018876) |
+| [The Things Indoor Gateway](https://connectedthings.store/gb/lorawan-gateways/indoor-lorawan-gateways/the-things-indoor-gateway-868-mhz.html) | LoRaWAN® gateway | SEK 750 | [RS-Components](https://se.rs-online.com/web/p/communication-wireless-development-tools/2018876) |
 
 At the time, some components where hard to find and as the idea of the project shifted I had to purchase material from 
-several vendors, however the freight cost from Mouser was zero (0) for orders exceeding SEK 500 so an additional GPS antenna
+several vendors, however the freight cost from *Mouser* was zero (0) for orders exceeding SEK 500 so an additional GPS antenna
 make that one free of charge. You should also have in mind that most of the vendors have a Swedish website but they are
 located outside EU (except *RS-Components*) which means that you have to be aware of taxes required when importing this.
 
-You should also know that when this report was written (autumn 2021), there was a global lack of semi-conductors and the brexit grinded the gears when it comes to transports within UK. Even though that I only ordered items in stock, the *Digikey* order took more than 2 weeks between confirmation and when it was delivered.
+You should also know that when this report was written (autumn 2021), there was a global lack of semi-conductors and the Brexit grinded the gears when it comes to transports within UK. Even though that I only ordered items in stock, the *Digikey* order took more than 2 weeks between confirmation and when it was delivered.
 
 
 ### Environment setup
@@ -62,12 +61,16 @@ complaining about the actual problems but rather wrap it some other mysterious e
 
 [Guide - Setup environment on you computer](https://hackmd.io/hMq4hSCJRIiwoeD2YKeILQ)
 
-The installation of the Indoor gateway is a straight forward task, where I first registered an account at The Things Network. From there I opened up the Console and selected the cluster node **Europe 1** and then claim my newly purchased gateway. Claiming basically means configure and make available. 
+The installation of the Indoor gateway is a straight forward task, where I first registered an account at The Things Network. From there I opened up the Console and selected the cluster node **Europe 1** and then claim my newly purchased gateway. Claiming basically means configure and make it available. 
 
 [Guide - Claim your TTSv3 Gateway](https://www.thethingsindustries.com/docs/gateways/gateway-claiming/claim-gateways/)
 
+
+
 >![List of gateways in The Things Stack Console](img/gateways-ttnv3.png)
->Fig 1, my registered/claimed gateways 
+>Fig 1, registered/claimed gateways displayed in the TTS Console
+
+
 
 As you can see there I've two registered gateways, the TTIG and the previously mentioned 1-channel *Dragino LG01-N*. 
 The difference is the cluster association where the older one can't be registered for the Europe 1 cluster but only 
@@ -80,20 +83,25 @@ We are now public and open for business.
 ><img src="img/public-apperance.png" style="zoom: 80%;" />
 >Fig 2, Gateway visible at the ttnmapper.org
 
+
+
 ### Putting everything together
 
 The TTN mapper is a neat task to put together where wiring the antenna is the only externals that has to be attached 
-to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *Lopy4* and *Pytrack* is a very compound unit easy to encapsulate and therefor as an experiment easy to be mobile. Mobility is a key concept for this kind of device otherwise we would not gain much when it comes to measure LoraWAN coverage.
+to the *Lopy4* resp. *Pytrack* expansion shield. As I previously mentioned the *Lopy4* and *Pytrack* is a very compound unit easy to encapsulate and therefor as an experiment easy to be mobile. Mobility is a key concept for this kind of device otherwise we would not gain much when it comes to measure LoRaWAN® coverage.
 
 >![Photo of a Lopy4 mounted at a Pytrack Shield](img/lopy4-pytrack-true.jpg)
 >Fig 3, the Lopy4 mounted at a Pytrack 2.0.X
 
+
+
 One should know that building a TTN mapper by yourself is more about having fun than filling a gap in the market.
 With that in mind you might also consider [cheaper hardware](https://sensebox.de/projects/en/2020-03-06-ttn-mapper) and perhaps focus on a high power usage efficiency but the *Pycom* parts has good documentation and with the *Pymakr* plugin I would say that I'm happy with using these components.
 
-The device desing is simple but we need to consider how to power the device and reason about the power source. 
+The device design is simple but we need to consider how to power the device and reason about the power source. 
 Using a deep sleep approach to preserve battery requires us to wait before getting coordinates as the GPS locator required 1 - 2 minutes to be accurate. 
-So, why did we then choose the *Pytrack* at all? The reason is simple, this is the nature of the GPS itself so regardless if we are using the Pytrack or any other disintegrated GPS locator we need to wait for it after it is powered up. With *Pytrack* we don't need an shield, like Expansion Board (link here) and a circuit board used for wiring the sensor so the *Pytrack* is quite cheap even though the GPS capability itself could be found slight cheaper. 
+
+So, why did we then choose the *Pytrack* at all? The reason is simple, this is the nature of the GPS itself so regardless if we are using the *Pytrack* or any other disintegrated GPS we need to wait for it after it is powered up. With *Pytrack* we don't need an shield, like the *Expansion Board 3.1* or a circuit board used for wiring the sensor so the *Pytrack* is quite cheap even though the GPS capability itself could be found slight cheaper. 
 
 So back to problem with the power consumption ...
 
@@ -108,9 +116,9 @@ Finally, the GPS sensor is quite sensitive when it comes to locating satellites,
 
 ### Platforms and infrastructure
 
-The problem definition is about having *LoraWAN* coverage at the countryside but also sharing why the TTIG gateway was used for this project. TTIG is naturally connected with the TTN so using its TTS as backend is more about using what we already have. 
+The problem definition is about having LoRaWAN® coverage at the countryside but also sharing why the TTIG was used for this project. TTIG is naturally connected with the TTN so using The Things Stack as backend is more about using what we already have. 
 
-TTN is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application, so you can think of TTN as middleware or service bus. There are many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
+TTN is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application, so you can think of TTS as a middleware or service bus. There are many predefined configurations, *MQTT*, *Webhooks* but also vendor specific in *Azure IoT Hub* and *AWS IoT* just to mention some. 
 
 For this project we need to connect it to the TTN Mapper application which helds a storage for coverage metrics contributed by idealists (and perhaps one or two commercial actors) in a true crowd sourcing spirit. So, the overall setup is quite simple, the device connects to (a) gateway and establish a session with the backend using the device *EUI*, at the backend each incoming requests from the device is formatted and forwarded to the TTN mapper application. 
 
@@ -126,9 +134,9 @@ The public community network uses a "fair use policy" which limits the **airtime
 
 ### The code
 
-Typically you setup connectivity in the `boot.py` but I had hard times to light up the Lopy4 RGB LED from there instead I placed all logic in the `main.py` file. I use the Lopy4 RGB LED as a indicator easy to spot when operating in the field. 
+Typically you setup connectivity in the `boot.py` but I had hard times to light up the *Lopy4* RGB LED from there instead I placed all logic in the `main.py` file. I use the *Lopy4* RGB LED as a indicator easy to spot when operating in the field. 
 
-First we try to join with the *LoraWAN*, but as we probably aren't always in range for a gateway we shouldn't avoid beeing stupid by continue forever, instead we retry 20 times and then take a break in our attempt to join. Once joined we indicate this by turning on the yellow color at the RGB LED which means we are open for business. 
+First we try to join with the LoRaWAN®, but as we probably aren't always in range for a gateway we shouldn't avoid beeing stupid by continue forever, instead we retry 20 times and then take a break in our attempt to join. Once joined we indicate this by turning on the yellow color at the RGB LED which means we are open for business. 
 
 ```python
 lora.join(activation=LoRa.OTAA, auth=(app_eui, app_key), timeout=0)
@@ -148,7 +156,7 @@ else:
 pycom.rgbled(0xFFFF00)
 ```
 
-The business logic is kept in a loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoraWAN. We ignore the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the ttnmapper.org documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default Pycom drivers for Pytrack only coordinates were accessible so I needed another driver which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found a matching one available at the [andreathemac GitHub repository](https://github.com/andrethemac/L76GLNSV4) 
+The business logic is kept in a loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoRaWAN®. We ignore the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the TTN Mapper documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default *Pycom* drivers for *Pytrack* only coordinates were accessible so I needed another driver which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found a matching one available at the [andreathemac GitHub repository](https://github.com/andrethemac/L76GLNSV4) 
 
 For each iteration in the loop, we make a GPS reading (`l76` is the object representing the sensor) and the check the quality before emitting an event to the gateway with the collected GPS values. During this process we visualize the progress with the RGB LED where
 
@@ -219,22 +227,22 @@ machine.deepsleep(60000) # Sleep for 1 minute
 
 ### The physical network layer
 
-The problem definition at first was how you could connect multiple devices for agricultural measures spread across 20 acres or more where some long range bearer was needed.  The lack of such bearer made me shifting focus and use some kind of self-service approach i e bring your own network and try to it as cheap as possible. So both LoraWAN and Sigfox would have been candidates but first seems to be more "open" or better documented than Sigfox. It also might have been influenced by previous class of the course where there were a lot of samples connecting with Lora. 
+The problem definition at first was how you could connect multiple devices for agricultural measures spread across 20 acres or more where some long range bearer was needed.  The lack of such bearer made me shifting focus and use some kind of self-service approach i e bring your own network and try to it as cheap as possible. So both LoRaWAN® and Sigfox would have been candidates but the first seems to have a better public available documentation than Sigfox. It also might have been influenced by previous classes of the course where there were a lot of samples connecting with LoRaWAN®. 
 
-For the Mapper device I started with the idea of a 1 minute execution cycle where the device was put in deep sleep between the send windows. 
-The *Pygate* can be kept awake while the machine is into deep sleep which saves time when it wakes up. The GPS will need 1 - 2 minutes before having a so called "fix" at the satellites. Sending a message every 6 minute would have cost us 1 second airtime each hour (~0.1 seconds for each message) which allows us to have the device powered up 24/7. The complete source for this "machine deep sleep/ GPS keep awake" configuration could be found in the [source catalog](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper).
+For the mapper device I started with the idea of a 1 minute execution cycle where the device was put in deep sleep between the send windows. 
+The *Pygate* can be kept awake while the machine is into deep sleep which saves time when it wakes up. The GPS will need 1 - 2 minutes before having a so called "fix" at the satellites. Sending a message every 6 minute would have cost us 1 second airtime each hour (~0.1 seconds for each message) which allows us to have the device continuously reporting 24/7. The complete source for this "machine deep sleep/ GPS keep awake" configuration could be found in the [source catalog](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper).
 
-Depending on the speed you are traveling with there might be a potential problem like a slew between the GPS readings and the payload transmission, I also find it a little bit boring waiting for the wake up call and therefor made some adjustments making it better for walking. In this scenario I never put the machine into deep sleep unless it couldn't find a LoraWAN network to join. Instead we keep the device join and pumping events every X seconds. 
+Depending on the speed you are traveling with there might be a potential problem with a slew between the GPS readings and the payload transmission, I also find it a little bit boring waiting for the wake up call and therefor made some adjustments making it better targeting a pedestrian carrier. In this scenario I never put the machine into deep sleep unless it couldn't find a LoRaWAN® network to join. Instead we keep the session (join) open and pumping events every X seconds. 
 
-Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my TTIG. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is probably caused by some kind of timing problem how the code uses the library or maybe the library itself, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver. I haven't solved this at this time but when I elaborated with the interval and set it to every 30 seconds it seems like the TTN Mapper became well-balanced when walking. The increased interval also allows us to use it for a longer period, approximately 150 minutes a day or a 12 km walk at the same time as the double-taps disappeared. 
+Starting with 10 seconds it allows us to rapidly create a pretty fine grained view over the coverage for my gateway. Sending a message every 10 seconds consumes 0.6 seconds airtime every minute which allows us to map for only 50 minutes a day, a 4 km walk. With this configuration I noticed that we got "double-taps" or paired readings close to each other but still with a 10 seconds difference in time. This symptom is probably caused by some kind of timing problem how the code uses the library or maybe the library itself, where GPS reads will eventually be *slight* stale at the time when data is requested from the driver. **I haven't figured out this yet** but when I elaborated with the interval and set it to every 30 seconds it seems like the mapper device became well-balanced when walking, so I consider this as a **work around** for now. The increased interval also allows us to use it for a longer period, approximately 150 minutes a day or a 12 km walk at the same time as the double-taps disappeared. 
 
 ><img src="img/different-time-settings.png" alt="Highlight of different interval settings from map" style="zoom: 67%;" />
 >Fig 6, Yellow boxes 10 seconds, Green 30 seconds
 
 
 
-The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites**. 
-There are still some optimization possible regarding passing number of satellites as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. 
+The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. 
+There are still some optimization possible regarding passing number of satellites as float instead of an unsigned integer but as our device both had a power source and was not intended to be autonomous for longer than a day I decided to spare complexity at the transformer at server-side rather than save those 2 extra bytes. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now. 
 
 ```python
 # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
@@ -242,7 +250,7 @@ There are still some optimization possible regarding passing number of satellite
 s.send(struct.pack('<10f',lat,long,sv,hdop))
 ```
 
-In the TTN console we can then easily pick up and transform the message by the built-in javascript formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request. This formatter is defined below the Applications section, selecting Payload formatters and then Uplink (incoming requests transformation).
+In the TTS console we can then easily pick up and transform the message by the built-in `javascript` formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request from the device. Defining a formatter in the TTS console could be done from Applications section, selecting Payload formatters and then Uplink (incoming requests transformation).
 
 ```javascript
 function decodeUplink(input) {
@@ -259,9 +267,9 @@ function decodeUplink(input) {
     data: {
       latitude : bytesToFloat(input.bytes.slice(0,4)),
       longitude : bytesToFloat(input.bytes.slice(4,8)),
-      altitude : 1,
       sats : bytesToFloat(input.bytes.slice(8,12)),
-      hdop : bytesToFloat(input.bytes.slice(12))
+      hdop : bytesToFloat(input.bytes.slice(12)),
+      altitude : 1
     },
     warnings: [],
     errors: []
@@ -289,25 +297,25 @@ When you finally start mapping coverage you will can see that everything works a
 
 
 
-The visualization in the [mapper](https://ttnmapper.org/) application is immediately available if you search for device EUI, gateway or experiment name in tab [Advanced maps](https://ttnmapper.org/advanced-maps/), the where the search result could be visualized in a [map](https://ttnmapper.org/devices/?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) or exported as a [csv](https://ttnmapper.org/devices/csv-pg.php?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) resultset. 
+The visualization in the [TTN Mapper](https://ttnmapper.org/) application is immediately available if you search for it directly using device EUI, gateway or experiment name in tab [Advanced maps](https://ttnmapper.org/advanced-maps/), where the search result could be visualized in a [map](https://ttnmapper.org/devices/?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) or exported as a [csv](https://ttnmapper.org/devices/csv-pg.php?device=eui-70b3d5499eca445d&startdate=&enddate=&gateways=on&lines=on&points=on) resultset. 
 
 ### Conclusions
 
-With a couple of mapping sessions, trying to cover the the same distance at north, south, east and west directions from the gateway, I'm stunningly realize that the Indoor gateway way exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the best strength which means it will easily cover`400 * 400 * 3,14 ~= 500000 square meters` which translates into 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without problem
+With a couple of mapping sessions, trying to cover the the same distance from north, south, east and west directions away from the gateway, I'm stunningly realize that the indoor gateway exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the highest strength which means it will easily cover `400 * 400 * 3,14 ~= 500000 square meters` equals to 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without any network accessibility problem.
 
 >![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low
 
-This means that the costs, **SEK 7,50/acre**, for manage your own *LoraWAN* network wouldn't be an issue as the sensors themselves way exceeds the network connectivity. However, there are of course a couple of concerns that needs to be covered. 
+This means that the costs, **SEK 7,50/acre**, for bringing your own LoRaWAN® network to the farm wouldn't be an issue as the sensors themselves way exceeds the network connectivity costs. However, there are of course a couple of concerns that needs to be addressed. 
 
-First, setting up a gateway for professional use is probably better done with an outdoor gateway with a constant power supply compared to an indoor ditto plugged in into a random power outlet. Mounted at a high place and with an external antenna it will also extends the range multiple times and provide a more reliable situation for the initial scenario. Still affordable, with a list price between [SEK 4000 - 6000](https://connectedthings.store/gb/lorawan-gateways/outdoor-lorawan-gateways/), it will cover at least 500 acres (yes, such linear approximation is stupid) but probably more for the same cost/acre. 
+First, setting up a gateway for professional use is probably better done with an outdoor gateway with a constant power supply compared to an indoor ditto plugged in into a random power outlet. Mounted at a high place and with an external antenna it will also extends the range multiple times and provide a more reliable access to LoRaWAN®. Still affordable, with a list price between [SEK 4000 - 6000](https://connectedthings.store/gb/lorawan-gateways/outdoor-lorawan-gateways/), the outdoor gateway will cover at least 500 acres (yes, such linear approximation is stupid) but probably more for the same cost/acre. 
 
-For agricultural sensors the covered area would more or less targeting open landscapes, without any hard obstacle, but many of the farms today typically have a mixed business model including both agricultural as well as forestry operations where the latter might be harder to apply IoT at. The same things applies to the open landscapes at a scattered property which could not be covered by a single gateway but has to be applied over several gateways, I believe this is were the crowd source aspects would matter. 
+For agricultural sensors the covered area would more or less targeting open landscapes, without any hard obstacle that might interfere the signals. However, many of the farms today typically have a mixed business model including both agricultural as well as forestry operations where the latter might be a bigger challenge when it comes to create network presence for Internet of Things. The same things applies to the open landscapes at a scattered property which could not be covered by a single gateway but has to be applied over several gateways, I believe this is were the crowd source aspects would matter. 
 
 #### If I had more time then I would have...
 
 * ... bought an outdoor gateway with antenna and performed the same measures to understand performance better
 * ... tested Sigfox connectivity using the same approach to see if a commercial network has a better coverage
-* ... tested with a passive external GPS antenna with a better "mobile-first" design 
-* ... elaborated more obstacles and degradations, i e how buildings, kind of forests, slopes, hills etc affects the signal  
-* ... fixed the physical packaging of the device with a wake up/deep sleep configuration and placed 3 or 4 of them on the companies fleet of vehicles for at least 1 month autonomous collecting data service in Växjö. 
+* ... tested with a passive external GPS antenna with a better "mobility-first" design 
+* ... elaborated with obstacles and degradations, i e how buildings, kind of forests, slopes, hills etc affects the signal  
+* ... fixed the physical packaging of the device with a wake up/deep sleep configuration and placed 3 or 4 of them on the companies fleet of vehicles for at least 1 month where they autonomous could collecting data in Växjö and surroundings 
