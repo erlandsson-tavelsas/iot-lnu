@@ -81,7 +81,9 @@ We are now public and open for business.
 ><img src="img/public-apperance.png" style="zoom: 80%;" />
 >Fig 2, Gateway visible at the ttnmapper.org
 
+We also need to setup our device in TTS, where TTS refers to them as application. Regardless of the naming you can find an excellent guide how to configure, setup and start using a device i TTS below. From this guide you should remember the Device EUI (used for searching in the TTN Mapper) and the Application Key (AppKey) which you need when joining (setting up a session) your device.
 
+[Guide - Setup a device in TTS](https://hackmd.io/@lnu-iot/rkWOVue6_)
 
 ### Putting everything together
 
@@ -168,6 +170,7 @@ while (True):
 
         # Read values one by one and convert them to floats
         # Could be more efficient by reading them all at the same time
+        # as these might causing the double-taps at smaller intervals between reads
         lat = float(l76.gps_message('GGA',debug=False)['Latitude'])
         long = float(l76.gps_message('GGA',debug=False)['Longitude'])
         sv = float(l76.gps_message('GGA',debug=False)['NumberOfSV'])
