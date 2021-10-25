@@ -24,7 +24,7 @@ To be honest, I bought an indoor gateway and hoped that if I put it close enough
 
 ### Material
 
-You shouldn't need to bother by setting up your own gateway but my original problem was the lack of LoRaWAN® presence so to start working I need such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty of other gateways you can use but this one comes with a automatic setup for TTNv3.
+You shouldn't really need to bother by setting up your own gateway but my original problem was the lack of LoRaWAN® presence so to start working I needed such a transport gateway. I bought a cheaper variant, the The Things Indoor Gateway (TTIG) for approximately EUR 80 (incl VAT), but there are plenty of other gateways you can use but this one comes with a automatic setup for TTNv3.
 
 *When I first started I didn't realized that there is a new version (3) of the TTN where the simplified*
 *Semtech UDP Packet Forwarder protocol has been abandoned something I realized as I first started to test with a cheaper (1-channel) gateway, the [Dragino LG01-N](https://www.dragino.com/products/lora-lorawan-gateway/item/117-lg01-p.html). I did manage to get this up and running but the lack of support in the TTS forced me to abandon this setup quite fast.*
@@ -37,7 +37,7 @@ Below you can find a list of the required hardware I used for the project and fr
 | --------- | ---------------- | ---------| ------- |
 | [Pycom Lopy4](https://pycom.io/product/lopy4/)   | Microcontroller | SEK 480 | [Digikey](https://www.digikey.se/products/sv?keywords=lopy4) |
 | [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
-| Pycom LoRa/Sigfox antenna | Send/receive | SEK 180 | [Digikey](https://www.digikey.se/product-detail/sv/pycom-ltd/SIGFOX-LORA-ANTENNA-KIT/1871-1005-ND/7721843) |
+| Pycom LoRaWAN®/Sigfox antenna | Send/receive | SEK 180 | [Digikey](https://www.digikey.se/product-detail/sv/pycom-ltd/SIGFOX-LORA-ANTENNA-KIT/1871-1005-ND/7721843) |
 | External GPS antenna  | Increased GPS receiver | SEK 225 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565430465?qs=sGAEpiMZZMv0NwlthflBi%252BaVk7F50MhHRCD37BDS1ng%3D) |
 | [The Things Indoor Gateway](https://connectedthings.store/gb/lorawan-gateways/indoor-lorawan-gateways/the-things-indoor-gateway-868-mhz.html) | LoRaWAN® gateway | SEK 750 | [RS-Components](https://se.rs-online.com/web/p/communication-wireless-development-tools/2018876) |
 
@@ -132,7 +132,7 @@ The public community network uses a "fair use policy" which limits the **airtime
 
 Typically you setup connectivity in the `boot.py` but I had hard times to light up the *Lopy4* RGB LED from there instead I placed all logic in the `main.py` file. I use the *Lopy4* RGB LED as a indicator easy to spot when operating in the field. 
 
-First we try to join with the LoRaWAN®, but as we probably aren't always in range for a gateway we shouldn't avoid being stupid allow the loop continue forever, instead we retry 20 times and then take a break in our attempt to join. Once joined we indicate this by turning on the yellow color at the RGB LED which means we are open for business. 
+First we try to join with the LoRaWAN®, but as we probably aren't always in range for a gateway we should avoid being stupid and keep the loop forever, instead we retry 20 times and then take a break in our attempt to join. Once joined we indicate this by turning on the yellow color at the RGB LED which means we are open for business. 
 
 ```python
 lora.join(activation=LoRa.OTAA, auth=(app_eui, app_key), timeout=0)
@@ -152,9 +152,9 @@ else:
 pycom.rgbled(0xFFFF00)
 ```
 
-The business logic is kept in a loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoRaWAN®. We ignore the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the TTN Mapper documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default *Pycom* drivers for *Pytrack* only coordinates were accessible so I needed another driver which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found one matching these requirements at the [andreathemac@GitHub](https://github.com/andrethemac/L76GLNSV4) repository 
+The business logic is kept in another loop where we fetch and send **coordinates**, **satellites** and **hdop** as bytes over LoRaWAN®. We ignore sending the numbers if the a quality is poor, i e the **hdop** value is less than 2 (according to the TTN Mapper documentation [FAQ](https://docs.ttnmapper.org/FAQ.html)). With the default *Pycom* drivers for *Pytrack* only coordinates were accessible from the driver so I needed another one which could read and expose all the required satellites data from the [NMEA-formatted](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) payload. Fortunately I found one matching these requirements at the [andreathemac@GitHub](https://github.com/andrethemac/L76GLNSV4) repository 
 
-For each iteration in the loop, we make a GPS reading (`l76` is the object representing the GPS) and check the quality before emitting an event to the gateway with the collected GPS values. During this process we visualize the progress with the RGB LED where
+For each iteration in the loop, we make a GPS reading (`l76` is the object representing the GPS in the source below) and check the quality before emitting an event to the gateway with the collected GPS values. During this process we visualize the progress with the RGB LED where
 
 - Blue is "waiting"
 - Green is "sending" 
@@ -211,9 +211,9 @@ while (True):
     pycom.rgbled(0x00FF00)
 ```
 
-During elaboration I made two separate project very similar to each other, one referred to as the [continuous on](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper%20-%20Always%20on) and the other as [deep sleep/awake](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper)
+During elaboration I made two separate projects very similar to each other, one referred to as the [continuous on](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper%20-%20Always%20on) and the other as the [deep sleep/awake](https://github.com/erlandsson-tavelsas/iot-lnu/tree/main/source/Mapper)
 
-The deep sleep/awake version is better suited for autonomous operations like being placed in a car and wake up every X minutes and do its job. To avoid unnecessary start up time for the GPS, which takes 1 - 2 minutes to get accurate readings, there is a feature where you can put the machine in deep sleep but preserve the *Pytrack* GPS powered. This is more or less the only difference between the two projects and could be summarized by these two line of code. 
+The deep sleep/awake version is better suited for autonomous operations like being placed in a car and wake up every X minutes and do its job. To avoid unnecessary start up time for the GPS, which takes 1 - 2 minutes to get accurate readings, there is a feature where you can put the machine in deep sleep but preserve the *Pytrack* GPS powered. This is more or less the only difference between the two projects and could be summarized by these two lines of code. 
 
 ```python
 # Keep the GPS powered up even though the machine is in deepsleep, this will result
