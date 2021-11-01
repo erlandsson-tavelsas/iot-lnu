@@ -112,7 +112,7 @@ Finally, the GPS sensor is quite sensitive when it comes to locating satellites,
 
 ### Platforms and infrastructure
 
-The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others so using a TTIG for this project is a no-brainer, especially as many of the vendors have such gateway in stock. TTIG is also naturally connected with the TTN so using The Things Stack (TTS) as backend is more about using what we already have.
+The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others so using a TTIG for this project is a no-brainer, especially as many of the vendors have such gateway in stock. TTIG is also naturally connected with the TTN where the choice of The Things Stack (TTS) as backend is more about using what we already have.
 
 TTS is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application. You can think of TTS as a middleware or service bus where you got access to many predefined configurations, *MQTT*, *Webhooks* but also vendor specific integrations for *Azure IoT Hub* and *AWS IoT* just to mention some. 
 
@@ -170,7 +170,7 @@ while (True):
 
         # Read values one by one and convert them to floats
         # Could be more efficient by reading them all at the same time
-        # as these might causing the double-taps at smaller intervals between reads
+        # as reading the them one by one might causing the double-taps at smaller intervals between reads
         lat = float(l76.gps_message('GGA',debug=False)['Latitude'])
         long = float(l76.gps_message('GGA',debug=False)['Longitude'])
         sv = float(l76.gps_message('GGA',debug=False)['NumberOfSV'])
@@ -246,7 +246,7 @@ There are still some optimization possible regarding passing number of satellite
 s.send(struct.pack('<10f',lat,long,sv,hdop))
 ```
 
-In the TTS console we can then easily pick up and transform the message by the built-in `javascript` formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request from the device. Defining a formatter in the TTS console could be done from Applications section, selecting Payload formatters and then Uplink (incoming requests transformation).
+In the TTS console we can then easily pick up and transform the message by the built-in `javascript` formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request from the device. Defining a formatter in the TTS console could be done from Applications section, selecting Payload formatters and then Uplink (incoming requests transformation). In the formatter the `input` variable is provided by the framework and contains the raw payload from the sensor. The returned object satisfies the framework contract where the attribute `data` contains the formatted payload.
 
 ```javascript
 function decodeUplink(input) {
