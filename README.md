@@ -36,7 +36,7 @@ Below you can find a list of the required hardware I used for the project and fr
 | Component | Capabilities | Price (incl VAT, excl freight) | Vendor link |
 | --------- | ---------------- | ---------| ------- |
 | [Pycom Lopy4](https://pycom.io/product/lopy4/)   | Microcontroller | SEK 480 | [Digikey](https://www.digikey.se/products/sv?keywords=lopy4) |
-| [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
+| [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS (and accelerator) | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
 | Pycom LoRaWAN®/Sigfox antenna | Send/receive | SEK 180 | [Digikey](https://www.digikey.se/product-detail/sv/pycom-ltd/SIGFOX-LORA-ANTENNA-KIT/1871-1005-ND/7721843) |
 | External GPS antenna  | Increased GPS receiver | SEK 225 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565430465?qs=sGAEpiMZZMv0NwlthflBi%252BaVk7F50MhHRCD37BDS1ng%3D) |
 | [The Things Indoor Gateway](https://connectedthings.store/gb/lorawan-gateways/indoor-lorawan-gateways/the-things-indoor-gateway-868-mhz.html) | LoRaWAN® gateway | SEK 750 | [RS-Components](https://se.rs-online.com/web/p/communication-wireless-development-tools/2018876) |
@@ -112,7 +112,7 @@ Finally, the GPS sensor is quite sensitive when it comes to locating satellites,
 
 ### Platforms and infrastructure
 
-The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others so using a TTIG for this project is a no-brainer, especially as many of the vendors have such gateway in stock. TTIG is also naturally connected with the TTN so using The Things Stack (TTS) as backend is more about using what we already have.
+The problem definition states that we need LoRaWAN® coverage at the countryside but also that we should share it with others so using a TTIG for this project is a no-brainer, especially as many of the vendors have such gateway in stock. TTIG is also naturally connected with the TTN where the choice of The Things Stack (TTS) as backend is more about using what we already have.
 
 TTS is about to connect data using some standard communication or storage solution which makes it generic when it comes to connecting a device with an application. You can think of TTS as a middleware or service bus where you got access to many predefined configurations, *MQTT*, *Webhooks* but also vendor specific integrations for *Azure IoT Hub* and *AWS IoT* just to mention some. 
 
@@ -170,7 +170,7 @@ while (True):
 
         # Read values one by one and convert them to floats
         # Could be more efficient by reading them all at the same time
-        # as these might causing the double-taps at smaller intervals between reads
+        # as reading the them one by one might causing the double-taps at smaller intervals between reads
         lat = float(l76.gps_message('GGA',debug=False)['Latitude'])
         long = float(l76.gps_message('GGA',debug=False)['Longitude'])
         sv = float(l76.gps_message('GGA',debug=False)['NumberOfSV'])
@@ -237,8 +237,7 @@ Starting with 10 seconds it allows us to rapidly create a pretty fine grained vi
 
 
 
-The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. 
-There are still some optimization possible regarding passing number of satellites as an unsigned integer instead of a float. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now regardless. Our device has both a power source and was not intended to be autonomous for longer than a day so I decided to spare complexity at the transformation at the server-side rather than save those 2 or 4 extra bytes while transmitting. 
+The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. There are still some optimization possible regarding passing number of satellites as an unsigned integer instead of a float. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now regardless. Our device has both a power source and was not intended to be autonomous for longer than a day so I decided to spare complexity at the transformation at the server-side rather than save those 2 or 4 extra bytes while transmitting. 
 
 ```python
 # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
@@ -246,7 +245,7 @@ There are still some optimization possible regarding passing number of satellite
 s.send(struct.pack('<10f',lat,long,sv,hdop))
 ```
 
-In the TTS console we can then easily pick up and transform the message by the built-in `javascript` formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request from the device. Defining a formatter in the TTS console could be done from Applications section, selecting Payload formatters and then Uplink (incoming requests transformation).
+In the TTS console we can then easily pick up and transform the message by the built-in `javascript` formatter utility, one would notice that I've hardwired the altitude but this is on purpose as we most of time holding the device a meter above ground so we don't need to send this information in every request from the device. Defining a formatter in the TTS console could be done from Applications section, selecting Payload formatters and then Uplink (incoming requests transformation). In the formatter the `input` variable is provided by the framework and contains the raw payload from the sensor. The returned object satisfies the framework contract where the attribute `data` contains the formatted payload.
 
 ```javascript
 function decodeUplink(input) {
@@ -297,7 +296,7 @@ The visualization in the [TTN Mapper](https://ttnmapper.org/) application is imm
 
 ### Conclusions
 
-With a couple of mapping sessions, trying to cover the the same distance from north, south, east and west directions away from the gateway, I stunningly realized that the indoor gateway exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the highest signal strength which means it will easily cover `400 * 400 * 3,14 ~= 500000 square meters` equals to 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without any network accessibility problem.
+With a couple of mapping sessions, trying to cover the the same distance from north, south, east and west directions away from the gateway, I stunningly realized that the indoor gateway exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the highest signal strength which means it will easily cover `400 * 400 * 3,14 ~= 500 000 square meters` equals to 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without any network accessibility problem.
 
 >![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low

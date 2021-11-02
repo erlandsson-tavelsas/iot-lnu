@@ -17,6 +17,8 @@ import gc
 import pycom
 import socket
 import struct
+import binascii
+from network import LoRa
 from machine import RTC
 from machine import SD
 from L76GLNSV4 import L76GNSS
@@ -115,6 +117,6 @@ while (True):
         pycom.rgbled(0xFF0000)
 
     # Sleep 30 seconds before retrying
-    time.sleep(30)
+    time.sleep(15)
     # Green light lit to indicate retrying
     pycom.rgbled(0x00FF00)
