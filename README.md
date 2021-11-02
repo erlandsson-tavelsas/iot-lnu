@@ -36,7 +36,7 @@ Below you can find a list of the required hardware I used for the project and fr
 | Component | Capabilities | Price (incl VAT, excl freight) | Vendor link |
 | --------- | ---------------- | ---------| ------- |
 | [Pycom Lopy4](https://pycom.io/product/lopy4/)   | Microcontroller | SEK 480 | [Digikey](https://www.digikey.se/products/sv?keywords=lopy4) |
-| [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
+| [Pytrack 2.0.x Expansion board](https://pycom.io/product/pytrack-2-0-x/)  | GPS (and accelerator) | SEK 460 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565286017?qs=sGAEpiMZZMv0NwlthflBi98X9085w8V%252BtWaXU%252BemDPA%3D) |
 | Pycom LoRaWAN®/Sigfox antenna | Send/receive | SEK 180 | [Digikey](https://www.digikey.se/product-detail/sv/pycom-ltd/SIGFOX-LORA-ANTENNA-KIT/1871-1005-ND/7721843) |
 | External GPS antenna  | Increased GPS receiver | SEK 225 | [Mouser](https://www.mouser.se/ProductDetail/Pycom/604565430465?qs=sGAEpiMZZMv0NwlthflBi%252BaVk7F50MhHRCD37BDS1ng%3D) |
 | [The Things Indoor Gateway](https://connectedthings.store/gb/lorawan-gateways/indoor-lorawan-gateways/the-things-indoor-gateway-868-mhz.html) | LoRaWAN® gateway | SEK 750 | [RS-Components](https://se.rs-online.com/web/p/communication-wireless-development-tools/2018876) |
@@ -237,8 +237,7 @@ Starting with 10 seconds it allows us to rapidly create a pretty fine grained vi
 
 
 
-The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. 
-There are still some optimization possible regarding passing number of satellites as an unsigned integer instead of a float. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now regardless. Our device has both a power source and was not intended to be autonomous for longer than a day so I decided to spare complexity at the transformation at the server-side rather than save those 2 or 4 extra bytes while transmitting. 
+The payload itself is kept at a (almost) bare minimum of 16 bytes, describing 4 float values, **longitude**, **latitude**, **hdop** and **number of visible satellites** **(sv)**. There are still some optimization possible regarding passing number of satellites as an unsigned integer instead of a float. The number of satellites is also not mandatory as long as we have the **hdop** value, but I decided to keep it for now regardless. Our device has both a power source and was not intended to be autonomous for longer than a day so I decided to spare complexity at the transformation at the server-side rather than save those 2 or 4 extra bytes while transmitting. 
 
 ```python
 # Payload size is 16 bytes (4*4) but can be optimized by omitting the sv (-4 bytes) or convert
@@ -297,7 +296,7 @@ The visualization in the [TTN Mapper](https://ttnmapper.org/) application is imm
 
 ### Conclusions
 
-With a couple of mapping sessions, trying to cover the the same distance from north, south, east and west directions away from the gateway, I stunningly realized that the indoor gateway exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the highest signal strength which means it will easily cover `400 * 400 * 3,14 ~= 500000 square meters` equals to 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without any network accessibility problem.
+With a couple of mapping sessions, trying to cover the the same distance from north, south, east and west directions away from the gateway, I stunningly realized that the indoor gateway exceeded my expectations by far concerning range. Picking up points at each direction gives me an average of at least 400 meters with the highest signal strength which means it will easily cover `400 * 400 * 3,14 ~= 500 000 square meters` equals to 50 ha or 100 acres. Within this range I also tested the **join capability** a couple of times where it successfully manage to join the network from the outer distances at 400 meters. This means that within this range it would be possible to place a sensor using deep sleep and wake up, join and then send data through the gateway without any network accessibility problem.
 
 >![Resulting coverage visualized in a map](img/expanded-coverage.png)
 >Fig 9, the covered area and measure locations, red = high, blue = low
